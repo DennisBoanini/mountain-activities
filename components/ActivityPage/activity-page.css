@@ -1,0 +1,231 @@
+.activities-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.activities-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.activities-counter {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.activities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* ======================
+   CARD ATTIVITÀ
+====================== */
+.activity-card {
+    position: relative; /* serve per overlay */
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 1.5rem;
+}
+
+/* Overlay di caricamento */
+.activity-card-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.7); /* overlay per tema chiaro */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: all; /* blocca click sotto */
+}
+
+.activity-card.loading .activity-content,
+.activity-card.loading .activity-actions {
+    opacity: 0.5;
+}
+
+/* Contenuto overlay */
+.activity-card-loading-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+/* Spinner */
+.activity-card-spinner {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    border: 2px solid var(--color-primary-light);
+    border-top-color: var(--color-primary);
+    animation: activity-spinner 0.7s linear infinite;
+}
+
+@keyframes activity-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.activity-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* ======================
+   TITOLO + ICONA STATO
+====================== */
+.activity-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.activity-status-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+}
+
+.activity-name {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.activity-name.done {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+}
+
+/* ======================
+   TAGS
+====================== */
+.activity-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+/* ======================
+   NOTA
+====================== */
+.activity-note {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+
+/* ======================
+   LINKS
+====================== */
+.activity-links {
+    display: flex;
+    flex-direction: row;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.activity-link {
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.activity-link:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+}
+
+.link-icon {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* ======================
+   METADATI
+====================== */
+.activity-meta {
+    margin: 0;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+/* ======================
+   PULSANTI
+====================== */
+.activity-actions {
+    display: flex;
+    flex-direction: row; /* richiesto da te */
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+/* ======================
+   EMPTY STATE
+====================== */
+.empty-state {
+    text-align: left;
+    max-width: 520px;
+    margin-top: 1rem;
+}
+
+.empty-title {
+    margin: 0 0 0.25rem 0;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.empty-text {
+    margin: 0 0 0.75rem 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ======================
+   RESPONSIVE
+====================== */
+@media (max-width: 768px) {
+    .activities-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .activities-header-right {
+        align-items: flex-start;
+    }
+
+    .activity-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .activity-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.35rem;
+        align-items: stretch;
+    }
+}
