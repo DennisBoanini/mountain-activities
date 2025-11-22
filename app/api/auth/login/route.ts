@@ -12,7 +12,7 @@ export async function POST(request: Request): Promise<NextResponse<{ message: st
     try {
         const body = (await request.json()) as LoginBody;
         const { username, password } = body;
-        console.log(body);
+        console.log("Entro con body", body);
 
         if (!username || !password) {
             return NextResponse.json({ error: "username and password are required" }, { status: 400 });
@@ -22,12 +22,14 @@ export async function POST(request: Request): Promise<NextResponse<{ message: st
         let uname: string | null = null;
 
         const db = await getDb();
+        console.log(db);
+        console.log("mi sono connesso al db");
         const user = await db.collection("users").findOne<{ _id: unknown; username: string; passwordHash: string }>({ username });
         if (!user) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
-        console.log(user);
+        console.log("Ho recuperato lo user", user);
         const ok = await verifyPassword(password, user.passwordHash);
         console.log(ok);
         if (!ok) {
