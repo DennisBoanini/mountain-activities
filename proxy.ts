@@ -3,7 +3,6 @@ import { verifySession } from "@/lib/jwt";
 
 export default async function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
-    console.log("PROXY HIT:", req.nextUrl.pathname);
 
     // 1. Tutte le API sono pubbliche, NON toccarle
     if (pathname.startsWith("/api")) {

@@ -1,13 +1,14 @@
 import LoginForm from "./LoginForm";
 
 type LoginPageProps = {
-    searchParams?: {
+    searchParams: Promise<{
         from?: string;
-    };
+    }>;
 };
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
-    const fromParam = searchParams?.from;
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+    const resolvedParams = await searchParams;
+    const fromParam = resolvedParams?.from;
     const from = typeof fromParam === "string" && fromParam.trim().length > 0 ? fromParam : "/";
 
     return (
