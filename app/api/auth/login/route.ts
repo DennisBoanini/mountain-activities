@@ -26,6 +26,7 @@ export async function POST(request: Request): Promise<NextResponse<{ message: st
         console.log("mi sono connesso al db");
         const user = await db.collection("users").findOne<{ _id: unknown; username: string; passwordHash: string }>({ username });
         if (!user) {
+            console.log("non trovo l'utente");
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
