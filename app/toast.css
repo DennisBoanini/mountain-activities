@@ -1,0 +1,83 @@
+.toast-container {
+    position: fixed;         /* 👉 se vuoi che segua la viewport */
+    /* oppure:
+       position: absolute;   /* se vuoi relativo al main/container */
+    right: 1.5rem;
+    bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 9999;
+}
+
+.toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    max-width: 280px;
+}
+
+.toast-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+
+/* Varianti */
+.toast-success {
+    border-color: #22c55e33;
+    background: #ecfdf3;
+}
+
+.toast-success .toast-dot {
+    background: #22c55e;
+}
+
+.toast-error {
+    border-color: #ef444433;
+    background: #fef2f2;
+}
+
+.toast-error .toast-dot {
+    background: #ef4444;
+}
+
+.toast-info {
+    border-color: #3b82f633;
+    background: #eff6ff;
+}
+
+.toast-info .toast-dot {
+    background: #3b82f6;
+}
+
+.toast-message {
+    color: var(--color-text-secondary);
+}
+
+.toast-top-left {
+    top: 1.5rem;
+    left: 1.5rem;
+}
+
+.toast-top-right {
+    top: 1.5rem;
+    right: 1.5rem;
+}
+
+.toast-bottom-left {
+    bottom: 1.5rem;
+    left: 1.5rem;
+}
+
+.toast-bottom-right {
+    bottom: 1.5rem;
+    right: 1.5rem;
+}

@@ -3,6 +3,7 @@
 @import "modal.css";
 @import "../components/ActivityPage/activity-page.css";
 @import "login/login.css";
+@import "toast.css";
 
 :root {
     /* Base */
