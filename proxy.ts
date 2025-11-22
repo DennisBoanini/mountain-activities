@@ -4,19 +4,37 @@ import { verifySession } from "@/lib/jwt";
 export default async function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
-    // 1. Tutte le API sono pubbliche, NON toccarle
+    const token = req.cookies.get("session")?.value || null;
+
+    // 1) API
     if (pathname.startsWith("/api")) {
-        return NextResponse.next();
+        // endpoint auth pubblici
+        if (pathname.startsWith("/api/auth")) {
+            return NextResponse.next();
+        }
+
+        // tutte le altre API sono protette
+        if (!token) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        try {
+            await verifySession(token);
+            return NextResponse.next();
+        } catch (e) {
+            console.error("Token non valido o scaduto (API)", e);
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
     }
 
-    // 2. Login page è pubblica
+    // 2) PAGINE
+
+    // login page è sempre pubblica
     if (pathname === "/login") {
         return NextResponse.next();
     }
 
-    // 3. Controllo cookie di sessione
-    const token = req.cookies.get("session")?.value;
-
+    // tutte le altre pagine sono protette
     if (!token) {
         const loginUrl = new URL("/login", req.url);
         loginUrl.searchParams.set("from", pathname);
@@ -24,18 +42,16 @@ export default async function proxy(req: NextRequest) {
     }
 
     try {
-        // verifyAuthToken deve verificare il token creato da signSession
         await verifySession(token);
         return NextResponse.next();
     } catch (e) {
-        console.error("Token non valido o scaduto", e);
+        console.error("Token non valido o scaduto (page)", e);
         const loginUrl = new URL("/login", req.url);
         loginUrl.searchParams.set("from", pathname);
         return NextResponse.redirect(loginUrl);
     }
 }
 
-// Matcha tutte le pagine
 export const config = {
     matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

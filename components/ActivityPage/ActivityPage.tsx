@@ -2,6 +2,7 @@
 import { CreateMountainActivity, MountainActivity } from "@/models/MountainActivity";
 import { useState } from "react";
 import CreateActivityModal from "@/components/ActivityPage/CreateActivityModal";
+import apiFetch from "@/lib/apiFetch";
 
 interface ActivityPageProps {
     activities: MountainActivity[];
@@ -16,7 +17,7 @@ export function ActivityPage({ activities }: ActivityPageProps) {
     async function fetchActivities(): Promise<void> {
         setLoading(true);
         try {
-            const res = await fetch("/api/activities");
+            const res = await apiFetch("/api/activities");
             const data = (await res.json()) as MountainActivity[];
             setActivitiesToShow(data);
         } catch (error: unknown) {
@@ -29,7 +30,7 @@ export function ActivityPage({ activities }: ActivityPageProps) {
     async function onSaveActivity(activityToCreate: CreateMountainActivity) {
         setLoading(true);
         try {
-            const response = await fetch("/api/activities", {
+            const response = await apiFetch("/api/activities", {
                 body: JSON.stringify(activityToCreate),
                 headers: { "Content-Type": "application/json" },
                 method: "POST",
@@ -40,7 +41,7 @@ export function ActivityPage({ activities }: ActivityPageProps) {
                 await fetchActivities();
             }
         } catch (e) {
-            console.log(e);
+            console.error(e);
         } finally {
             setLoading(false);
         }
@@ -53,7 +54,7 @@ export function ActivityPage({ activities }: ActivityPageProps) {
         setLoadingActivityId(mountainActivity._id);
 
         try {
-            await fetch(`/api/activities/${mountainActivity._id}`, {
+            await apiFetch(`/api/activities/${mountainActivity._id}`, {
                 method: "DELETE",
             });
             void fetchActivities();
@@ -68,7 +69,7 @@ export function ActivityPage({ activities }: ActivityPageProps) {
         setLoadingActivityId(mountainActivity._id);
 
         try {
-            await fetch(`/api/activities/${mountainActivity._id}`, {
+            await apiFetch(`/api/activities/${mountainActivity._id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ done: !mountainActivity.done }),

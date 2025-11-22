@@ -22,6 +22,10 @@ export async function getDb(): Promise<Db> {
     }
 
     db = client.db(dbName);
-    console.log("Connesso al DB:", db.databaseName);
+
+    // crea l'indice TTL se non esiste
+    await db.collection("login_attempts").createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 });
+    await db.collection("sessions").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
     return db;
 }
