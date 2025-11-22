@@ -12,7 +12,6 @@ export async function POST(request: Request): Promise<NextResponse<{ message: st
     try {
         const body = (await request.json()) as LoginBody;
         const { username, password } = body;
-        console.log("Entro con body", body);
 
         if (!username || !password) {
             return NextResponse.json({ error: "username and password are required" }, { status: 400 });
@@ -22,32 +21,66 @@ export async function POST(request: Request): Promise<NextResponse<{ message: st
         let uname: string | null = null;
 
         const db = await getDb();
-        console.log(db);
-        console.log("mi sono connesso al db");
+
+        const ip = (request.headers.get("x-forwarded-for") || "").split(",")[0] || "unknown";
+        const now = new Date();
+        const windowStart = new Date(now.getTime() - Number(process.env.WINDOW_MINUTES) * 60 * 1000);
+
+        const recentAttempts = await db.collection("login_attempts").countDocuments({
+            username,
+            ip,
+            createdAt: { $gte: windowStart },
+        });
+        if (recentAttempts >= Number(process.env.MAX_ATTEMPTS)) {
+            return NextResponse.json(
+                {
+                    error: "Troppi tentativi di accesso. Riprova più tardi",
+                },
+                { status: 429 },
+            );
+        }
+
         const user = await db.collection("users").findOne<{ _id: unknown; username: string; passwordHash: string }>({ username });
         if (!user) {
-            console.log("non trovo l'utente");
+            await db.collection("login_attempts").insertOne({
+                username,
+                ip,
+                createdAt: new Date(),
+            });
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
-        console.log("Ho recuperato lo user", user);
         const ok = await verifyPassword(password, user.passwordHash);
-        console.log(ok);
         if (!ok) {
+            await db.collection("login_attempts").insertOne({
+                username,
+                ip,
+                createdAt: new Date(),
+            });
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         userId = String(user._id);
         uname = user.username;
 
-        if (!userId || !uname) {
-            return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-        }
+        const sessionId = crypto.randomUUID();
+        const expiresAt = new Date(now.getTime() + Number(process.env.SESSION_DAYS) * 24 * 60 * 60 * 1000);
+
+        await db.collection("sessions").insertOne({
+            sessionId,
+            userId,
+            username: uname,
+            createdAt: now,
+            expiresAt,
+            revoked: false,
+            ip,
+            userAgent: request.headers.get("user-agent") || "",
+        });
 
         const token = await signSession({
             sub: userId,
             username: uname,
+            sid: sessionId,
         });
 
         const res = NextResponse.json({ message: "Logged in" });
@@ -58,7 +91,7 @@ export async function POST(request: Request): Promise<NextResponse<{ message: st
             sameSite: "lax",
             secure: isProd,
             path: "/",
-            maxAge: 60 * 60 * 24 * 30, // 30 giorni
+            maxAge: 60 * 60 * 24 * Number(process.env.SESSION_DAYS),
         });
 
         return res;

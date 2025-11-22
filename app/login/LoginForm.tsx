@@ -2,14 +2,15 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import apiFetch from "@/lib/apiFetch";
 
 type LoginFormProps = {
     from: string;
 };
 
 export default function LoginForm({ from }: LoginFormProps) {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [username, setUsername] = useState(process.env.NODE_ENV === "production" ? "" : "dennis.boanini01@gmail.com");
+    const [password, setPassword] = useState(process.env.NODE_ENV === "production" ? "" : "825Eo^@vpAz^CO!@A");
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -21,7 +22,7 @@ export default function LoginForm({ from }: LoginFormProps) {
         setLoading(true);
 
         try {
-            const res = await fetch("/api/auth/login", {
+            const res = await apiFetch("/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
