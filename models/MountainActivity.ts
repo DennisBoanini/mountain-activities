@@ -9,7 +9,7 @@ export type MountainActivity = {
     done: boolean;
     note: string;
     mountainGroup: string;
-    summitAltitude: number;
+    summitAltitude: number | null;
     tags: string[];
     links: MountainActivityLink[];
     createdAt: string;

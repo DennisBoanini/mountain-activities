@@ -49,7 +49,7 @@ export async function POST(request: Request): Promise<NextResponse<MountainActiv
             done: Boolean(done),
             tags: parsedTags,
             mountainGroup,
-            summitAltitude,
+            summitAltitude: summitAltitude,
             links: parsedLinks,
             createdAt: now.toISOString(),
             updatedAt: now.toISOString(),
