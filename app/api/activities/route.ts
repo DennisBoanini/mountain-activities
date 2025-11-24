@@ -1,50 +1,30 @@
 import { NextResponse } from "next/server";
-import {
-    CreateMountainActivity,
-    MountainActivity,
-    MountainActivityLink,
-} from "@/models/MountainActivity";
+import { CreateMountainActivity, MountainActivity, MountainActivityLink } from "@/models/MountainActivity";
 import { getDb } from "@/lib/mongodb";
 import { getActivities } from "@/lib/activities";
 
-export async function GET(): Promise<
-    NextResponse<MountainActivity[] | { error: string }>
-> {
+export async function GET(): Promise<NextResponse<MountainActivity[] | { error: string }>> {
     try {
         const list = await getActivities();
         return NextResponse.json(list);
     } catch (error: unknown) {
         console.error("Error fetching activities:", error);
-        return NextResponse.json(
-            { error: "Failed to fetch activities" },
-            { status: 500 },
-        );
+        return NextResponse.json({ error: "Failed to fetch activities" }, { status: 500 });
     }
 }
 
-export async function POST(
-    request: Request,
-): Promise<NextResponse<MountainActivity | { error: string }>> {
+export async function POST(request: Request): Promise<NextResponse<MountainActivity | { error: string }>> {
     try {
         const body = (await request.json()) as CreateMountainActivity;
-        const { name, done, tags, note, links } = body;
+        const { name, done, tags, note, links, summitAltitude, mountainGroup } = body;
 
-        if (!name || typeof name !== "string") {
-            return NextResponse.json(
-                { error: "name is required" },
-                { status: 400 },
-            );
+        if (!name || name.trim().length === 0) {
+            return NextResponse.json({ error: "name is required" }, { status: 400 });
         }
 
-        const parsedTags: string[] = Array.isArray(tags)
-            ? tags.map((t) => t.trim()).filter((t) => t.length > 0)
-            : [];
+        const parsedTags: string[] = Array.isArray(tags) ? tags.map((t) => t.trim()).filter((t) => t.length > 0) : [];
 
-        const parsedLinks: MountainActivityLink[] = Array.isArray(links)
-            ? links.filter(
-                  (link) => link.link.length > 0 && link.name.length > 0,
-              )
-            : [];
+        const parsedLinks: MountainActivityLink[] = Array.isArray(links) ? links.filter((link) => link.link.length > 0 && link.name.length > 0) : [];
 
         const db = await getDb();
         const now = new Date();
@@ -54,13 +34,13 @@ export async function POST(
             tags: parsedTags,
             links: parsedLinks,
             note: note.trim(),
+            summitAltitude,
+            mountainGroup: mountainGroup.trim(),
             createdAt: now,
             updatedAt: now,
         };
 
-        const insertResult = await db
-            .collection("mountain_activities")
-            .insertOne(docToInsert);
+        const insertResult = await db.collection("mountain_activities").insertOne(docToInsert);
 
         const created: MountainActivity = {
             _id: insertResult.insertedId.toString(),
@@ -68,6 +48,8 @@ export async function POST(
             note: note.trim(),
             done: Boolean(done),
             tags: parsedTags,
+            mountainGroup,
+            summitAltitude: summitAltitude,
             links: parsedLinks,
             createdAt: now.toISOString(),
             updatedAt: now.toISOString(),
@@ -76,9 +58,6 @@ export async function POST(
         return NextResponse.json(created, { status: 201 });
     } catch (error: unknown) {
         console.error("Error creating attivita:", error);
-        return NextResponse.json(
-            { error: "Failed to create attivita" },
-            { status: 500 },
-        );
+        return NextResponse.json({ error: "Failed to create attivita" }, { status: 500 });
     }
 }

@@ -38,7 +38,6 @@ export async function verifySession(token: string) {
     const userId = payload.sub as string | undefined;
     const username = payload.username as string | undefined;
     const sid = payload.sid as string | undefined;
-    console.log("verifySession", userId, username, sid);
 
     if (!userId || !sid) {
         throw new Error("Sessione non valida: campi mancanti");

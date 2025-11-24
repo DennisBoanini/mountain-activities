@@ -1,10 +1,7 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
-import {
-    CreateMountainActivity,
-    MountainActivityLink,
-} from "@/models/MountainActivity";
+import { CreateMountainActivity, MountainActivityLink } from "@/models/MountainActivity";
 
 type Props = {
     isLoading: boolean;
@@ -16,21 +13,11 @@ export default function CreateActivityModal(props: Props) {
     const [activityName, setActivityName] = useState<string>("");
     const [activityTags, setActivityTags] = useState<string>("");
     const [activityNote, setActivityNote] = useState<string>("");
-    const [activityLinks, setActivityLinks] = useState<MountainActivityLink[]>(
-        [],
-    );
+    const [activityLinks, setActivityLinks] = useState<MountainActivityLink[]>([]);
     const [activityDone, setActivityDone] = useState<boolean>(false);
 
-    function handleLinkChange(
-        index: number,
-        field: keyof MountainActivityLink,
-        value: string,
-    ) {
-        setActivityLinks((prev) =>
-            prev.map((link, i) =>
-                i === index ? { ...link, [field]: value } : link,
-            ),
-        );
+    function handleLinkChange(index: number, field: keyof MountainActivityLink, value: string) {
+        setActivityLinks((prev) => prev.map((link, i) => (i === index ? { ...link, [field]: value } : link)));
     }
 
     function addEmptyLink() {
@@ -47,9 +34,7 @@ export default function CreateActivityModal(props: Props) {
             .map((t) => t.trim())
             .filter(Boolean);
 
-        const cleanedLinks = activityLinks.filter(
-            (l) => l.name.trim() !== "" || l.link.trim() !== "",
-        );
+        const cleanedLinks = activityLinks.filter((l) => l.name.trim() !== "" || l.link.trim() !== "");
 
         const activityToCreate: CreateMountainActivity = {
             name: activityName,
@@ -57,6 +42,8 @@ export default function CreateActivityModal(props: Props) {
             tags: cleanedTags,
             note: activityNote,
             links: cleanedLinks,
+            mountainGroup: "",
+            summitAltitude: null,
         };
 
         props.onSaveActivity(activityToCreate);
@@ -70,10 +57,7 @@ export default function CreateActivityModal(props: Props) {
                 {!props.isLoading && (
                     <>
                         <div className="form-field">
-                            <label
-                                htmlFor="activityName"
-                                className="form-label"
-                            >
+                            <label htmlFor="activityName" className="form-label">
                                 Nome attività
                             </label>
                             <input
@@ -82,17 +66,12 @@ export default function CreateActivityModal(props: Props) {
                                 className="input"
                                 placeholder="Es. Cervino, via normale..."
                                 value={activityName}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                    setActivityName(e.target.value)
-                                }
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setActivityName(e.target.value)}
                             />
                         </div>
 
                         <div className="form-field">
-                            <label
-                                htmlFor="activityTags"
-                                className="form-label"
-                            >
+                            <label htmlFor="activityTags" className="form-label">
                                 Tags (separa con virgola)
                             </label>
                             <input
@@ -101,17 +80,12 @@ export default function CreateActivityModal(props: Props) {
                                 className="input"
                                 placeholder="Es. Cresta, 4000, Invernale"
                                 value={activityTags}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                    setActivityTags(e.target.value)
-                                }
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setActivityTags(e.target.value)}
                             />
                         </div>
 
                         <div className="form-field">
-                            <label
-                                htmlFor="activityNote"
-                                className="form-label"
-                            >
+                            <label htmlFor="activityNote" className="form-label">
                                 Note
                             </label>
                             <textarea
@@ -119,9 +93,7 @@ export default function CreateActivityModal(props: Props) {
                                 className="input"
                                 placeholder="Es. Qualche nota utile"
                                 value={activityNote}
-                                onChange={(
-                                    e: ChangeEvent<HTMLTextAreaElement>,
-                                ) => setActivityNote(e.target.value)}
+                                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setActivityNote(e.target.value)}
                             />
                         </div>
 
@@ -138,25 +110,13 @@ export default function CreateActivityModal(props: Props) {
                                 <div
                                     key={index}
                                     style={{
-                                        borderBottom:
-                                            index < activityLinks.length - 1
-                                                ? "1px solid #e5e7eb"
-                                                : "none",
-                                        paddingBottom:
-                                            index < activityLinks.length - 1
-                                                ? "0.75rem"
-                                                : 0,
-                                        marginBottom:
-                                            index < activityLinks.length - 1
-                                                ? "0.75rem"
-                                                : 0,
+                                        borderBottom: index < activityLinks.length - 1 ? "1px solid #e5e7eb" : "none",
+                                        paddingBottom: index < activityLinks.length - 1 ? "0.75rem" : 0,
+                                        marginBottom: index < activityLinks.length - 1 ? "0.75rem" : 0,
                                     }}
                                 >
                                     <div className="form-field">
-                                        <label
-                                            htmlFor={`link-name-${index}`}
-                                            className="form-label"
-                                        >
+                                        <label htmlFor={`link-name-${index}`} className="form-label">
                                             Nome link
                                         </label>
                                         <input
@@ -165,23 +125,12 @@ export default function CreateActivityModal(props: Props) {
                                             className="input"
                                             placeholder="Es. Relazione, Articolo, Meteo..."
                                             value={link.name}
-                                            onChange={(
-                                                e: ChangeEvent<HTMLInputElement>,
-                                            ) =>
-                                                handleLinkChange(
-                                                    index,
-                                                    "name",
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => handleLinkChange(index, "name", e.target.value)}
                                         />
                                     </div>
 
                                     <div className="form-field">
-                                        <label
-                                            htmlFor={`link-url-${index}`}
-                                            className="form-label"
-                                        >
+                                        <label htmlFor={`link-url-${index}`} className="form-label">
                                             URL
                                         </label>
                                         <input
@@ -190,35 +139,19 @@ export default function CreateActivityModal(props: Props) {
                                             className="input"
                                             placeholder="https://..."
                                             value={link.link}
-                                            onChange={(
-                                                e: ChangeEvent<HTMLInputElement>,
-                                            ) =>
-                                                handleLinkChange(
-                                                    index,
-                                                    "link",
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => handleLinkChange(index, "link", e.target.value)}
                                         />
                                     </div>
 
                                     <div style={{ textAlign: "right" }}>
-                                        <button
-                                            type="button"
-                                            className="secondary danger"
-                                            onClick={() => removeLink(index)}
-                                        >
+                                        <button type="button" className="secondary danger" onClick={() => removeLink(index)}>
                                             Rimuovi link
                                         </button>
                                     </div>
                                 </div>
                             ))}
 
-                            <button
-                                type="button"
-                                className="tertiary"
-                                onClick={addEmptyLink}
-                            >
+                            <button type="button" className="tertiary" onClick={addEmptyLink}>
                                 + Aggiungi link utile
                             </button>
                         </div>
@@ -229,25 +162,16 @@ export default function CreateActivityModal(props: Props) {
                                     type="checkbox"
                                     id="activityDone"
                                     checked={activityDone}
-                                    onChange={(
-                                        e: ChangeEvent<HTMLInputElement>,
-                                    ) => setActivityDone(e.target.checked)}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setActivityDone(e.target.checked)}
                                 />
-                                <label
-                                    htmlFor="activityDone"
-                                    className="form-label"
-                                >
+                                <label htmlFor="activityDone" className="form-label">
                                     Attività completata
                                 </label>
                             </div>
                         </div>
 
                         <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="secondary"
-                                onClick={props.onCloseModal}
-                            >
+                            <button type="button" className="secondary" onClick={props.onCloseModal}>
                                 Chiudi
                             </button>
                             <button type="button" onClick={prepareActivity}>
