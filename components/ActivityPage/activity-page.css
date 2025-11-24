@@ -269,6 +269,42 @@
     font-size: 0.9rem;
 }
 
+/* Info extra: gruppo montuoso + quota vetta */
+.activity-extra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+.activity-extra-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.activity-extra-icon {
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+.activity-extra-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.1rem;
+}
+
+.activity-extra-unit {
+    font-size: 0.75em;
+    color: var(--color-text-muted);
+}
+
+
 /* ============================
    RESPONSIVE
 ============================ */

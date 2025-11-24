@@ -231,6 +231,28 @@ export function ActivityPage({ activities }: ActivityPageProps) {
                                             <div className="activity-title">
                                                 <h3 className={`activity-name${ac.done ? " done" : ""}`}>{ac.name}</h3>
                                             </div>
+
+                                            {(ac.mountainGroup || ac.summitAltitude) && (
+                                                <div className="activity-extra">
+                                                    {ac.mountainGroup && (
+                                                        <div className="activity-extra-item">
+                                                            <span className="activity-extra-icon">🗺️</span>
+                                                            <span className="activity-extra-label">{ac.mountainGroup}</span>
+                                                        </div>
+                                                    )}
+
+                                                    {ac.summitAltitude && (
+                                                        <div className="activity-extra-item">
+                                                            <span className="activity-extra-icon">🏔️</span>
+                                                            <span className="activity-extra-label">
+                                                                {ac.summitAltitude}
+                                                                <span className="activity-extra-unit"> m</span>
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
                                             {ac.tags?.length > 0 && (
                                                 <div className="activity-tags">
                                                     {ac.tags.map((tag) => (
