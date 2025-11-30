@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Josefin_Sans } from "next/font/google";
 import "./globals.css";
 import LayoutHeader from "@/app/layoutHeader";
+import { cookies } from "next/headers";
+import { verifySession } from "@/lib/jwt";
 
-const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
+const poppins = Josefin_Sans({
     subsets: ["latin"],
 });
 
@@ -18,15 +14,28 @@ export const metadata: Metadata = {
     description: "Applicazione per attività alpinistiche",
 };
 
-export default function RootLayout({
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    let completeName: string | undefined = undefined;
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("session")?.value;
+        if (token) {
+            const { completeName: sessionCompleteName } = await verifySession(token);
+            completeName = sessionCompleteName;
+        }
+    } catch (e: unknown) {
+        console.error(e);
+    }
     return (
         <html lang="it">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                <LayoutHeader />
+            <body className={`${poppins.className} antialiased`}>
+                <LayoutHeader loggedUser={completeName} />
                 {children}
             </body>
         </html>

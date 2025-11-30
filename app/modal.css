@@ -17,8 +17,7 @@
     box-shadow: var(--shadow-lg);
     padding: 1.75rem;
     border-radius: 12px;
-    /*width: auto;*/
-    min-width: 30%;
+    min-width: 50%;
     color: var(--color-text-primary);
     animation: modalFadeIn 0.18s ease-out;
 }

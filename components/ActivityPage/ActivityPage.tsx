@@ -4,6 +4,7 @@ import { CreateMountainActivity, MountainActivity } from "@/models/MountainActiv
 import CreateActivityModal from "@/components/ActivityPage/CreateActivityModal";
 import { ToastNotification } from "@/components/Toast/ToastNotification";
 import { ConfirmDeleteModal } from "@/components/ActivityPage/ConfirmDeleteModal";
+import AddRelationToActivityAndSetCompletedModal from "@/components/ActivityPage/AddRelationToActivityAndSetCompletedModal";
 
 type ToastState = {
     show: boolean;
@@ -20,10 +21,12 @@ interface ActivityPageProps {
 export function ActivityPage({ activities }: ActivityPageProps) {
     const [activitiesToShow, setActivitiesToShow] = useState<MountainActivity[]>(activities);
     const [showAddActivityModal, setShowAddActivityModal] = useState(false);
+    const [showAddRelationAndSaveModal, setShowAddRelationAndSaveModal] = useState<MountainActivity | undefined>();
     const [loading, setLoading] = useState(false);
     const [cardLoadingId, setCardLoadingId] = useState<string | null>(null);
     const [activityToDelete, setActivityToDelete] = useState<MountainActivity | null>(null);
     const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+    const [filterTag, setFilterTag] = useState<string>("all");
     const [search, setSearch] = useState("");
     const [toast, setToast] = useState<ToastState>({
         show: false,
@@ -72,17 +75,18 @@ export function ActivityPage({ activities }: ActivityPageProps) {
                 await fetchActivities();
             }
         } catch (e) {
-            console.log(e);
+            console.error(e);
         }
     }
 
     async function onSetDone(mountainActivity: MountainActivity): Promise<void> {
         setCardLoadingId(mountainActivity._id);
+        setShowAddRelationAndSaveModal(undefined);
         try {
             await apiFetch(`/api/activities/${mountainActivity._id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ done: !mountainActivity.done }),
+                body: JSON.stringify({ done: !mountainActivity.done, relation: mountainActivity.relation }),
             });
             void fetchActivities();
             showToast("Attività aggiornata con successo", "success");
@@ -100,13 +104,29 @@ export function ActivityPage({ activities }: ActivityPageProps) {
     }, [activitiesToShow]);
 
     const filteredActivities = useMemo(() => {
-        return activitiesToShow.filter((a) => {
-            if (filterStatus === "done" && !a.done) return false;
-            if (filterStatus === "todo" && a.done) return false;
+        return activitiesToShow
+            .filter((a) => {
+                if (filterStatus === "done" && !a.done) return false;
+                if (filterStatus === "todo" && a.done) return false;
 
-            return !(search.trim().length > 0 && !a.name.toLowerCase().includes(search.toLowerCase()));
-        });
-    }, [activitiesToShow, filterStatus, search]);
+                return !(search.trim().length > 0 && !a.name.toLowerCase().includes(search.toLowerCase()));
+            })
+            .filter((a) => {
+                if (filterTag === "all") return true;
+
+                return a.tags.includes(filterTag);
+            });
+    }, [activitiesToShow, filterStatus, search, filterTag]);
+
+    const tags = useMemo(() => {
+        const set = new Set<string>();
+        activities
+            .map((ac) => ac.tags)
+            .flatMap((tag) => tag)
+            .forEach((tag) => set.add(tag));
+
+        return Array.from(set);
+    }, [activities]);
 
     function requestDelete(mountainActivity: MountainActivity) {
         setActivityToDelete(mountainActivity);
@@ -151,15 +171,34 @@ export function ActivityPage({ activities }: ActivityPageProps) {
             {/* HEADER */}
             <div className="activities-header">
                 <div>
-                    <h2 className="page-title">Attività alpinistiche</h2>
-                    <p className="page-subtitle">Tieni d&apos;occhio le salite sognate e quelle già portate a casa.</p>
-                    <p className="activities-counter">
+                    <h2 className="page-title">Tieni d&apos;occhio le salite sognate e quelle già portate a casa</h2>
+                    <p className="activities-counter page-subtitle">
                         Totali: <strong>{stats.total}</strong> · Da fare: <strong>{stats.todo}</strong> · Completate: <strong>{stats.done}</strong>
                     </p>
                 </div>
 
                 <div className="activities-header-right">
-                    <div className="filter-row">
+                    <button className="button" type="button" onClick={() => setShowAddActivityModal(true)}>
+                        + Aggiungi attività
+                    </button>
+                </div>
+            </div>
+
+            {/* LISTA ATTIVITÀ */}
+            <div className="activities-list-container">
+                <div className={"activities-filters card-filters"}>
+                    <input
+                        type="search"
+                        className="input"
+                        placeholder="Filtra per nome attività..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+
+                    <hr />
+
+                    <div>
+                        <h4>Filtri per stato</h4>
                         <div className="filter-chips">
                             <button
                                 type="button"
@@ -183,129 +222,150 @@ export function ActivityPage({ activities }: ActivityPageProps) {
                                 Completate
                             </button>
                         </div>
-                        <input
-                            type="search"
-                            className="input input-small"
-                            placeholder="Filtra per nome..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
                     </div>
 
-                    <button className="button" type="button" onClick={() => setShowAddActivityModal(true)}>
-                        + Aggiungi attività
-                    </button>
+                    <hr />
+
+                    <div>
+                        <h4>Filtri per tag</h4>
+                        <div className="filter-chips">
+                            <button type="button" className={filterTag === "all" ? "chip chip-active" : "chip"} onClick={() => setFilterTag("all")}>
+                                Tutti
+                            </button>
+                            {tags.map((tag) => (
+                                <button
+                                    key={tag}
+                                    type="button"
+                                    className={filterTag === tag ? "chip chip-active" : "chip"}
+                                    onClick={() => setFilterTag(tag)}
+                                >
+                                    {tag}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <div className={"activities-list"}>
+                    {filteredActivities.length === 0 && !loading && (
+                        <div className="empty-state card">
+                            <h3 className="empty-title">Nessuna attività trovata</h3>
+                            <p className="empty-text">Aggiungi una nuova salita o cambia i filtri per vedere le attività esistenti.</p>
+                        </div>
+                    )}
 
-            {/* LISTA ATTIVITÀ */}
-            <div className="activities-list">
-                {filteredActivities.length === 0 && !loading && (
-                    <div className="empty-state card">
-                        <h3 className="empty-title">Nessuna attività trovata</h3>
-                        <p className="empty-text">Aggiungi una nuova salita o cambia i filtri per vedere le attività esistenti.</p>
-                        <button className="secondary" type="button" onClick={() => setShowAddActivityModal(true)}>
-                            + Nuova attività
-                        </button>
-                    </div>
-                )}
+                    {filteredActivities.map((ac) => {
+                        const isCardLoading = cardLoadingId === ac._id;
 
-                {filteredActivities.map((ac) => {
-                    const isCardLoading = cardLoadingId === ac._id;
-
-                    return (
-                        <article key={ac._id} className={`card activity-card${isCardLoading ? " activity-card--loading" : ""}`}>
-                            {isCardLoading && (
-                                <div className="activity-card-overlay">
-                                    <span className="spinner" />
-                                </div>
-                            )}
-
-                            <div className="activity-content">
-                                <div className="activity-top-row">
-                                    <div className="activity-main">
-                                        <span className="activity-status-icon" title={ac.done ? "Completata" : "Da fare"}>
-                                            {ac.done ? "✔️" : "◻️"}
-                                        </span>
-                                        <div className="activity-info">
-                                            <div className="activity-title">
-                                                <h3 className={`activity-name${ac.done ? " done" : ""}`}>{ac.name}</h3>
-                                            </div>
-
-                                            {(ac.mountainGroup || ac.summitAltitude) && (
-                                                <div className="activity-extra">
-                                                    {ac.mountainGroup && (
-                                                        <div className="activity-extra-item">
-                                                            <span className="activity-extra-icon">🗺️</span>
-                                                            <span className="activity-extra-label">{ac.mountainGroup}</span>
-                                                        </div>
-                                                    )}
-
-                                                    {ac.summitAltitude && (
-                                                        <div className="activity-extra-item">
-                                                            <span className="activity-extra-icon">🏔️</span>
-                                                            <span className="activity-extra-label">
-                                                                {ac.summitAltitude}
-                                                                <span className="activity-extra-unit"> m</span>
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {ac.tags?.length > 0 && (
-                                                <div className="activity-tags">
-                                                    {ac.tags.map((tag) => (
-                                                        <span className="tag" key={`${ac._id}-tag-${tag}`}>
-                                                            {tag}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {ac.note && <p className="activity-note">{ac.note}</p>}
-
-                                {ac.links?.length > 0 && (
-                                    <div className="activity-links">
-                                        {ac.links.map((link) => (
-                                            <a
-                                                key={`${ac._id}-${link.link}`}
-                                                href={link.link}
-                                                className="activity-link-chip"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <span>🔗</span>
-                                                <span>{link.name || link.link}</span>
-                                            </a>
-                                        ))}
+                        return (
+                            <article key={ac._id} className={`card activity-card${isCardLoading ? " activity-card--loading" : ""}`}>
+                                {isCardLoading && (
+                                    <div className="activity-card-overlay">
+                                        <span className="spinner" />
                                     </div>
                                 )}
 
-                                <p className="activity-meta">
-                                    Creata il {new Date(ac.createdAt).toLocaleDateString("it-IT")} · Ultimo aggiornamento{" "}
-                                    {new Date(ac.updatedAt).toLocaleDateString("it-IT")}
-                                </p>
-                            </div>
+                                <div className="activity-content">
+                                    <div className="activity-top-row">
+                                        <div className="activity-main">
+                                            <span className="activity-status-icon" title={ac.done ? "Completata" : "Da fare"}>
+                                                {ac.done ? "✔️" : "◻️"}
+                                            </span>
+                                            <div className="activity-info">
+                                                <div className="activity-title">
+                                                    <h3 className={`activity-name${ac.done ? " done" : ""}`}>{ac.name}</h3>
+                                                </div>
 
-                            <div className="activity-actions">
-                                <button className="secondary" type="button" disabled={isCardLoading} onClick={() => onSetDone(ac)}>
-                                    {ac.done ? "Segna da fare" : "Segna fatta"}
-                                </button>
-                                <button className="danger" type="button" disabled={isCardLoading} onClick={() => requestDelete(ac)}>
-                                    Elimina
-                                </button>
-                            </div>
-                        </article>
-                    );
-                })}
+                                                {(ac.mountainGroup || ac.summitAltitude) && (
+                                                    <div className="activity-extra">
+                                                        {ac.mountainGroup && (
+                                                            <div className="activity-extra-item">
+                                                                <span className="activity-extra-icon">🗺️</span>
+                                                                <span className="activity-extra-label">{ac.mountainGroup}</span>
+                                                            </div>
+                                                        )}
+
+                                                        {ac.summitAltitude && (
+                                                            <div className="activity-extra-item">
+                                                                <span className="activity-extra-icon">🏔️</span>
+                                                                <span className="activity-extra-label">
+                                                                    {ac.summitAltitude}
+                                                                    <span className="activity-extra-unit"> m</span>
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {ac.tags?.length > 0 && (
+                                                    <div className="activity-tags">
+                                                        {ac.tags.map((tag) => (
+                                                            <span className="tag" key={`${ac._id}-tag-${tag}`}>
+                                                                {tag}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {ac.note && <p className="activity-note">{ac.note}</p>}
+
+                                    {ac.links?.length > 0 && (
+                                        <div className="activity-links">
+                                            {ac.links.map((link) => (
+                                                <a
+                                                    key={`${ac._id}-${link.link}`}
+                                                    href={link.link}
+                                                    className="activity-link-chip"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <span>🔗</span>
+                                                    <span>{link.name || link.link}</span>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <p className="activity-meta">
+                                        Creata il {new Date(ac.createdAt).toLocaleDateString("it-IT")} · Ultimo aggiornamento{" "}
+                                        {new Date(ac.updatedAt).toLocaleDateString("it-IT")}
+                                    </p>
+                                </div>
+
+                                <div className="activity-actions">
+                                    <button
+                                        className="secondary"
+                                        type="button"
+                                        disabled={isCardLoading}
+                                        onClick={() => setShowAddRelationAndSaveModal(ac)}
+                                    >
+                                        {ac.done ? "Segna da fare" : "Segna fatta"}
+                                    </button>
+                                    <button className="danger" type="button" disabled={isCardLoading} onClick={() => requestDelete(ac)}>
+                                        Elimina
+                                    </button>
+                                </div>
+                            </article>
+                        );
+                    })}
+                </div>
             </div>
 
             {showAddActivityModal && (
-                <CreateActivityModal isLoading={loading} onCloseModal={() => setShowAddActivityModal(false)} onSaveActivity={onSaveActivity} />
+                <CreateActivityModal
+                    isLoading={loading}
+                    onCloseModalAction={() => setShowAddActivityModal(false)}
+                    onSaveActivityAction={onSaveActivity}
+                />
+            )}
+
+            {showAddRelationAndSaveModal && (
+                <AddRelationToActivityAndSetCompletedModal
+                    onCloseModalAction={() => setShowAddRelationAndSaveModal(undefined)}
+                    onSaveAction={(relation) => onSetDone({ ...showAddRelationAndSaveModal, relation })}
+                />
             )}
 
             <ConfirmDeleteModal

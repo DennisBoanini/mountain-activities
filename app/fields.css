@@ -1,10 +1,17 @@
 /* ========== LAYOUT GENERICO CAMPI ========== */
 
+.form-field-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .form-field {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     margin-bottom: 1rem;
+    flex: 1;
 }
 
 .form-label {

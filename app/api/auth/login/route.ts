@@ -40,7 +40,9 @@ export async function POST(request: Request): Promise<NextResponse<{ message: st
             );
         }
 
-        const user = await db.collection("users").findOne<{ _id: unknown; username: string; passwordHash: string }>({ username });
+        const user = await db
+            .collection("users")
+            .findOne<{ _id: unknown; username: string; passwordHash: string; completeName: string }>({ username });
         if (!user) {
             await db.collection("login_attempts").insertOne({
                 username,
@@ -80,6 +82,7 @@ export async function POST(request: Request): Promise<NextResponse<{ message: st
         const token = await signSession({
             sub: userId,
             username: uname,
+            completeName: user.completeName,
             sid: sessionId,
         });
 

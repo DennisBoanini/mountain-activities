@@ -5,16 +5,19 @@ import { CreateMountainActivity, MountainActivityLink } from "@/models/MountainA
 
 type Props = {
     isLoading: boolean;
-    onSaveActivity: (activityToCreate: CreateMountainActivity) => void;
-    onCloseModal: () => void;
+    onSaveActivityAction: (activityToCreate: CreateMountainActivity) => void;
+    onCloseModalAction: () => void;
 };
 
 export default function CreateActivityModal(props: Props) {
     const [activityName, setActivityName] = useState<string>("");
-    const [activityTags, setActivityTags] = useState<string>("");
-    const [activityNote, setActivityNote] = useState<string>("");
-    const [activityLinks, setActivityLinks] = useState<MountainActivityLink[]>([]);
     const [activityDone, setActivityDone] = useState<boolean>(false);
+    const [activityNote, setActivityNote] = useState<string>("");
+    const [activityMountainGroup, setActivityMountainGroup] = useState<string>("");
+    const [activitySummitAltitude, setActivitySummitAltitude] = useState<string>("");
+    const [activityTags, setActivityTags] = useState<string>("");
+    const [activityPlace, setActivityPlace] = useState<string>("");
+    const [activityLinks, setActivityLinks] = useState<MountainActivityLink[]>([]);
 
     function handleLinkChange(index: number, field: keyof MountainActivityLink, value: string) {
         setActivityLinks((prev) => prev.map((link, i) => (i === index ? { ...link, [field]: value } : link)));
@@ -39,14 +42,14 @@ export default function CreateActivityModal(props: Props) {
         const activityToCreate: CreateMountainActivity = {
             name: activityName,
             done: activityDone,
-            tags: cleanedTags,
             note: activityNote,
+            mountainGroup: activityMountainGroup,
+            summitAltitude: Number(activitySummitAltitude),
+            tags: cleanedTags,
             links: cleanedLinks,
-            mountainGroup: "",
-            summitAltitude: null,
         };
 
-        props.onSaveActivity(activityToCreate);
+        props.onSaveActivityAction(activityToCreate);
     }
 
     return (
@@ -81,6 +84,49 @@ export default function CreateActivityModal(props: Props) {
                                 placeholder="Es. Cresta, 4000, Invernale"
                                 value={activityTags}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => setActivityTags(e.target.value)}
+                            />
+                        </div>
+
+                        <div className={"form-field-row"}>
+                            <div className="form-field">
+                                <label htmlFor="mountainGroup" className="form-label">
+                                    Catena montuosa di appartenenza
+                                </label>
+                                <input
+                                    id="mountainGroup"
+                                    type="text"
+                                    className="input"
+                                    placeholder="Es. Alpi Apuane"
+                                    value={activityMountainGroup}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setActivityMountainGroup(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-field">
+                                <label htmlFor="summit" className="form-label">
+                                    Altitudine raggiunta
+                                </label>
+                                <input
+                                    id="summit"
+                                    type="number"
+                                    className="input"
+                                    placeholder="Es. 1782"
+                                    value={activitySummitAltitude}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setActivitySummitAltitude(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={"form-field"}>
+                            <label htmlFor="activityPlace" className="form-label">
+                                Dove si trova
+                            </label>
+                            <input
+                                id="activityPlace"
+                                className="input"
+                                type={"text"}
+                                placeholder="Inserisci info utili su dove si trova questa attività"
+                                value={activityPlace}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setActivityPlace(e.target.value)}
                             />
                         </div>
 
@@ -171,7 +217,7 @@ export default function CreateActivityModal(props: Props) {
                         </div>
 
                         <div className="modal-footer">
-                            <button type="button" className="secondary" onClick={props.onCloseModal}>
+                            <button type="button" className="secondary" onClick={props.onCloseModalAction}>
                                 Chiudi
                             </button>
                             <button type="button" onClick={prepareActivity}>
