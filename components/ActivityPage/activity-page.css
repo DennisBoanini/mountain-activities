@@ -39,10 +39,13 @@
    FILTRI & SEARCH
 ============================ */
 
-.filter-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.card-filters {
+    background: var(--color-surface);
+    padding: 1.125rem;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+    height: min-content;
 }
 
 .filter-chips {
@@ -71,20 +74,24 @@
     color: var(--color-primary);
 }
 
-.input-small {
-    max-width: 220px;
-    font-size: 0.85rem;
-    padding: 0.3rem 0.6rem;
-}
-
 /* ============================
    LISTA ATTIVITÀ
 ============================ */
+
+.activities-list-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.activities-filters {
+    min-width: 25%;
+}
 
 .activities-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    width: 100%;
 }
 
 /* ============================
@@ -253,8 +260,6 @@
 
 .empty-state {
     text-align: left;
-    max-width: 520px;
-    margin-top: 1rem;
 }
 
 .empty-title {

@@ -72,7 +72,7 @@ header {
     background: var(--color-header-bg);
     color: var(--color-header-text);
     padding: 0 0.5rem;
-    font-size: 20px;
+    font-size: 1.2rem;
     font-weight: 600;
     box-shadow: var(--shadow-md);
     display: flex;
@@ -85,8 +85,12 @@ h1 {
     margin: 0;
 }
 
+p {
+    margin: 0;
+}
+
 .container {
-    padding: 40px;
+    padding: 10px;
 }
 
 .card {
@@ -95,8 +99,6 @@ h1 {
     border-radius: 12px;
     border: 1px solid var(--color-border);
     box-shadow: var(--shadow-md);
-    /*max-width: 420px;*/
-    margin-bottom: 1rem;
 }
 
 .muted {
@@ -128,3 +130,90 @@ h1 {
 .tag.altitude { background: var(--color-accent-altitude); }
 .tag.route { background: var(--color-accent-route); }
 .tag.danger { background: var(--color-danger); }
+
+/* ============================
+   LOGGED USER
+============================ */
+.logged-user {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.logged-user > p {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+}
+
+
+
+.logged-user > p::after {
+    content: "";
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-block;
+    background-image: url("/caret.svg"); /* oppure /caret-down-svgrepo-com.svg */
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    transition: transform 0.2s ease;
+}
+
+.logged-user.logged-user--open > p::after {
+    transform: rotate(180deg);
+}
+
+.logged-user > .avatar {
+    border-radius: 20%;
+    height: 3rem;
+    width: 3rem;
+    background-color: var(--color-primary);
+
+    position: relative;
+    overflow: hidden;
+}
+
+.user-menu {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    padding: 0.25rem 0;
+    min-width: 180px;
+    display: none;
+    z-index: 1000;
+}
+
+.logged-user.logged-user--open .user-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-menu button {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--color-text-primary);
+    transition: background 0.15s ease;
+}
+
+.user-menu button:hover {
+    background: var(--color-bg-secondary);
+}
+
+.user-menu .danger {
+    color: var(--color-danger);
+}

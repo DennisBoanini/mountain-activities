@@ -11,6 +11,7 @@ export type MountainActivity = {
     mountainGroup: string;
     summitAltitude: number | null;
     tags: string[];
+    relation: string;
     links: MountainActivityLink[];
     createdAt: string;
     updatedAt: string;

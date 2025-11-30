@@ -51,6 +51,7 @@ export async function POST(request: Request): Promise<NextResponse<MountainActiv
             mountainGroup,
             summitAltitude: summitAltitude,
             links: parsedLinks,
+            relation: "",
             createdAt: now.toISOString(),
             updatedAt: now.toISOString(),
         };
