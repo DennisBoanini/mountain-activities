@@ -14,6 +14,7 @@ export async function getActivities() {
         summitAltitude: d.summitAltitude as number,
         tags: Array.isArray(d.tags) ? (d.tags as string[]) : [],
         links: d.links as MountainActivityLink[],
+        relation: d.relation,
         createdAt: (d.createdAt ?? new Date()).toString(),
         updatedAt: d.updatedAt ? d.updatedAt.toString() : undefined,
     }));
