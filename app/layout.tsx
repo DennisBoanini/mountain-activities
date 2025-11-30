@@ -14,6 +14,8 @@ export const metadata: Metadata = {
     description: "Applicazione per attività alpinistiche",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
     children,
 }: Readonly<{
