@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Josefin_Sans } from "next/font/google";
 import "./globals.css";
 import LayoutHeader from "@/app/layoutHeader";
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/jwt";
 
-const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
+const poppins = Josefin_Sans({
     subsets: ["latin"],
 });
 
@@ -38,8 +32,8 @@ export default async function RootLayout({
     }
     return (
         <html lang="it">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                <LayoutHeader />
+            <body className={`${poppins.className} antialiased`}>
+                <LayoutHeader loggedUser={completeName} />
                 {children}
             </body>
         </html>
