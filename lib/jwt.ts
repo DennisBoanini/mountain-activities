@@ -16,6 +16,7 @@ const key = new TextEncoder().encode(SECRET);
 export type SessionPayload = {
     sub: string;
     username: string;
+    completeName: string;
     sid: string;
 };
 
@@ -25,6 +26,7 @@ export async function signSession(payload: SessionPayload): Promise<string> {
     return await new SignJWT({
         sub: payload.sub,
         username: payload.username,
+        completeName: payload.completeName,
         sid: payload.sid,
     })
         .setProtectedHeader({ alg: "HS256" })
@@ -37,6 +39,7 @@ export async function verifySession(token: string) {
     const { payload } = await jwtVerify(token, key);
     const userId = payload.sub as string | undefined;
     const username = payload.username as string | undefined;
+    const completeName = payload.completeName as string | undefined;
     const sid = payload.sid as string | undefined;
 
     if (!userId || !sid) {
@@ -59,5 +62,6 @@ export async function verifySession(token: string) {
         userId,
         username: username ?? session.username,
         sessionId: sid,
+        completeName,
     };
 }

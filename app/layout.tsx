@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LayoutHeader from "@/app/layoutHeader";
+import { cookies } from "next/headers";
+import { verifySession } from "@/lib/jwt";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -18,11 +20,22 @@ export const metadata: Metadata = {
     description: "Applicazione per attività alpinistiche",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    let completeName: string | undefined = undefined;
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("session")?.value;
+        if (token) {
+            const { completeName: sessionCompleteName } = await verifySession(token);
+            completeName = sessionCompleteName;
+        }
+    } catch (e: unknown) {
+        console.error(e);
+    }
     return (
         <html lang="it">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
