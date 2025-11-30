@@ -51,6 +51,7 @@
 .filter-chips {
     display: flex;
     gap: 0.35rem;
+    flex-wrap: wrap;
 }
 
 .chip {

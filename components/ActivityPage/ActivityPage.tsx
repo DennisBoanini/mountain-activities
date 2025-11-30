@@ -26,6 +26,7 @@ export function ActivityPage({ activities }: ActivityPageProps) {
     const [cardLoadingId, setCardLoadingId] = useState<string | null>(null);
     const [activityToDelete, setActivityToDelete] = useState<MountainActivity | null>(null);
     const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+    const [filterTag, setFilterTag] = useState<string>("all");
     const [search, setSearch] = useState("");
     const [toast, setToast] = useState<ToastState>({
         show: false,
@@ -103,13 +104,29 @@ export function ActivityPage({ activities }: ActivityPageProps) {
     }, [activitiesToShow]);
 
     const filteredActivities = useMemo(() => {
-        return activitiesToShow.filter((a) => {
-            if (filterStatus === "done" && !a.done) return false;
-            if (filterStatus === "todo" && a.done) return false;
+        return activitiesToShow
+            .filter((a) => {
+                if (filterStatus === "done" && !a.done) return false;
+                if (filterStatus === "todo" && a.done) return false;
 
-            return !(search.trim().length > 0 && !a.name.toLowerCase().includes(search.toLowerCase()));
-        });
-    }, [activitiesToShow, filterStatus, search]);
+                return !(search.trim().length > 0 && !a.name.toLowerCase().includes(search.toLowerCase()));
+            })
+            .filter((a) => {
+                if (filterTag === "all") return true;
+
+                return a.tags.includes(filterTag);
+            });
+    }, [activitiesToShow, filterStatus, search, filterTag]);
+
+    const tags = useMemo(() => {
+        const set = new Set<string>();
+        activities
+            .map((ac) => ac.tags)
+            .flatMap((tag) => tag)
+            .forEach((tag) => set.add(tag));
+
+        return Array.from(set);
+    }, [activities]);
 
     function requestDelete(mountainActivity: MountainActivity) {
         setActivityToDelete(mountainActivity);
@@ -204,6 +221,27 @@ export function ActivityPage({ activities }: ActivityPageProps) {
                             >
                                 Completate
                             </button>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div>
+                        <h4>Filtri per tag</h4>
+                        <div className="filter-chips">
+                            <button type="button" className={filterTag === "all" ? "chip chip-active" : "chip"} onClick={() => setFilterTag("all")}>
+                                Tutti
+                            </button>
+                            {tags.map((tag) => (
+                                <button
+                                    key={tag}
+                                    type="button"
+                                    className={filterTag === tag ? "chip chip-active" : "chip"}
+                                    onClick={() => setFilterTag(tag)}
+                                >
+                                    {tag}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>
