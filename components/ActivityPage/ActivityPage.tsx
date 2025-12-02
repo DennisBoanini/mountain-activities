@@ -296,7 +296,10 @@ export function ActivityPage({ activities }: ActivityPageProps) {
                                             </span>
                                             <div className="activity-info">
                                                 <div className="activity-title">
-                                                    <h3 className={`activity-name${ac.done ? " done" : ""}`}>{ac.name}</h3>
+                                                    <h3 className={`activity-name${ac.done ? " done" : ""}`}>
+                                                        {ac.name}
+                                                        {ac.place.length > 0 && <span> - {ac.place}</span>}
+                                                    </h3>
                                                 </div>
 
                                                 {(ac.mountainGroup || ac.summitAltitude) && (

@@ -12,6 +12,7 @@ export async function getActivities() {
         note: d.note as string,
         mountainGroup: d.mountainGroup as string,
         summitAltitude: d.summitAltitude as number,
+        place: d.place,
         tags: Array.isArray(d.tags) ? (d.tags as string[]) : [],
         links: d.links as MountainActivityLink[],
         relation: d.relation,
