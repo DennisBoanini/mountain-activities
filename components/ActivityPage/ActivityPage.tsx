@@ -96,6 +96,20 @@ export function ActivityPage({ activities }: ActivityPageProps) {
         }
     }
 
+    async function onSetUndone(id: string): Promise<void> {
+        setCardLoadingId(id);
+        try {
+            await apiFetch(`/api/activities/${id}/undone`, {
+                method: "PUT",
+            });
+            void fetchActivities();
+            showToast("Attività aggiornata con successo", "success");
+        } catch (error: unknown) {
+            console.error("Error updating attivita:", error);
+            setCardLoadingId(null);
+        }
+    }
+
     const stats = useMemo(() => {
         const total = activitiesToShow.length;
         const done = activitiesToShow.filter((a) => a.done).length;
@@ -267,7 +281,17 @@ export function ActivityPage({ activities }: ActivityPageProps) {
                                 <div className="activity-content">
                                     <div className="activity-top-row">
                                         <div className="activity-main">
-                                            <span className="activity-status-icon" title={ac.done ? "Completata" : "Da fare"}>
+                                            <span
+                                                className="activity-status-icon"
+                                                title={ac.done ? "Completata" : "Da fare"}
+                                                onClick={() => {
+                                                    if (ac.done) {
+                                                        onSetUndone(ac._id);
+                                                    } else {
+                                                        setShowAddRelationAndSaveModal(ac);
+                                                    }
+                                                }}
+                                            >
                                                 {ac.done ? "✔️" : "◻️"}
                                             </span>
                                             <div className="activity-info">
@@ -335,14 +359,6 @@ export function ActivityPage({ activities }: ActivityPageProps) {
                                 </div>
 
                                 <div className="activity-actions">
-                                    <button
-                                        className="secondary"
-                                        type="button"
-                                        disabled={isCardLoading}
-                                        onClick={() => setShowAddRelationAndSaveModal(ac)}
-                                    >
-                                        {ac.done ? "Segna da fare" : "Segna fatta"}
-                                    </button>
                                     <button className="danger" type="button" disabled={isCardLoading} onClick={() => requestDelete(ac)}>
                                         Elimina
                                     </button>
