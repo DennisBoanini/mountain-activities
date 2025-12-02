@@ -16,7 +16,7 @@ export async function GET(): Promise<NextResponse<MountainActivity[] | { error: 
 export async function POST(request: Request): Promise<NextResponse<MountainActivity | { error: string }>> {
     try {
         const body = (await request.json()) as CreateMountainActivity;
-        const { name, done, tags, note, links, summitAltitude, mountainGroup } = body;
+        const { name, done, tags, note, links, summitAltitude, mountainGroup, place } = body;
 
         if (!name || name.trim().length === 0) {
             return NextResponse.json({ error: "name is required" }, { status: 400 });
@@ -34,6 +34,7 @@ export async function POST(request: Request): Promise<NextResponse<MountainActiv
             tags: parsedTags,
             links: parsedLinks,
             note: note.trim(),
+            place: place.trim(),
             summitAltitude,
             mountainGroup: mountainGroup.trim(),
             createdAt: now,
@@ -48,6 +49,7 @@ export async function POST(request: Request): Promise<NextResponse<MountainActiv
             note: note.trim(),
             done: Boolean(done),
             tags: parsedTags,
+            place,
             mountainGroup,
             summitAltitude: summitAltitude,
             links: parsedLinks,
