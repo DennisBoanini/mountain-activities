@@ -45,7 +45,7 @@ export default function CreateActivityModal(props: Props) {
             note: activityNote,
             mountainGroup: activityMountainGroup,
             place: activityPlace,
-            summitAltitude: Number(activitySummitAltitude),
+            summitAltitude: Number(activitySummitAltitude) || null,
             tags: cleanedTags,
             links: cleanedLinks,
         };
